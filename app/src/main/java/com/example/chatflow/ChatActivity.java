@@ -1,5 +1,10 @@
 package com.example.chatflow;
 
+import android.app.Dialog;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -56,6 +61,10 @@ public class ChatActivity extends AppCompatActivity {
         if (otherUser.getProfilePicBase64() != null) {
             AndroidUtil.setProfilePicFromBase64(this, otherUser.getProfilePicBase64(), imageView);
         }
+        imageView.setOnClickListener(v -> {
+            // Show the image in the dialog
+            showImagePopup();
+        });
 
         backBtn.setOnClickListener(v -> onBackPressed());
         otherUsername.setText(otherUser.getUsername());
@@ -124,5 +133,41 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
     }
-}
 
+    private void showImagePopup() {
+        // Create a dialog to show the image
+        final Dialog imageDialog = new Dialog(this);
+        imageDialog.setContentView(R.layout.dialog_image_popup);
+        ImageView popupImageView = imageDialog.findViewById(R.id.popup_image_view);
+        Drawable imageDrawable = imageView.getDrawable();
+
+        if (imageDrawable != null) {
+            // Convert Drawable to Bitmap (assuming it's BitmapDrawable)
+            Bitmap bitmap = drawableToBitmap(imageDrawable);
+
+            // Scale the Bitmap (for example, make it larger)
+            Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, 800, 800, true);
+
+            // Set the scaled bitmap to the dialog's ImageView
+            popupImageView.setImageBitmap(scaledBitmap);
+        }
+
+        // Show the dialog
+        imageDialog.show();
+    }
+
+    // Helper method to convert Drawable to Bitmap
+    private Bitmap drawableToBitmap(Drawable drawable) {
+        if (drawable instanceof BitmapDrawable) {
+            return ((BitmapDrawable) drawable).getBitmap();
+        }
+
+        // If not BitmapDrawable, create a new Bitmap from the drawable
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+        return bitmap;
+    }
+
+}

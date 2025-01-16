@@ -4,13 +4,16 @@
     <item android:title="Chats"
         android:icon="@drawable/chat_icon"
         android:id="@+id/menu_chat"
+        android:iconTint="@color/black"
         />
     <item android:title="Profile"
         android:icon="@drawable/person_icon"
         android:id="@+id/menu_profile"
+        android:iconTint="@color/black"
         />
     <item android:title="Settings"
-        android:icon="@drawable/person_icon"
+        android:icon="@drawable/settings_icon"
+        android:iconTint="@color/black"
         android:id="@+id/menu_settings"
         />
 </menu>

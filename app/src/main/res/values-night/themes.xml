@@ -1,17 +1,17 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme for Night mode. -->
+    <!-- Base application theme. -->
     <style name="Theme.ChatFlow" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- Primary brand color for dark theme. -->
-        <item name="colorPrimary">@color/my_primary_dark</item>
-        <item name="colorPrimaryVariant">@color/my_primary_dark</item>
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/my_primary</item>
+        <item name="colorPrimaryVariant">@color/my_primary</item>
         <item name="colorOnPrimary">@color/white</item>
-        <!-- Secondary brand color for dark theme. -->
-        <item name="colorSecondary">@color/my_secondary_dark</item>
-        <item name="colorSecondaryVariant">@color/my_secondary_dark</item>
-        <item name="colorOnSecondary">@color/white</item>
-        <!-- Status bar color for dark theme. -->
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/my_secondary</item>
+        <item name="colorSecondaryVariant">@color/my_secondary</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme for dark mode. -->
-        <item name="android:windowBackground">@color/dark_background</item>
+        <!-- Customize your theme here. -->
+        <item name="android:windowBackground">@color/off_white</item>
     </style>
 </resources>
