@@ -6,6 +6,7 @@
         android:id="@+id/menu_chat"
         android:iconTint="@color/black"
         />
+
     <item android:title="Profile"
         android:icon="@drawable/person_icon"
         android:id="@+id/menu_profile"

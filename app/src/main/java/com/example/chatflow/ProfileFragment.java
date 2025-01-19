@@ -25,7 +25,6 @@ import com.example.chatflow.model.UserModel;
 import com.example.chatflow.utils.AndroidUtil;
 import com.example.chatflow.utils.FirebaseUtil;
 import com.github.dhaval2404.imagepicker.ImagePicker;
-import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -37,7 +36,6 @@ public class ProfileFragment extends Fragment {
     EditText phoneInput;
     Button updateProfileBtn;
     ProgressBar progressBar;
-    TextView logoutBtn;
 
     UserModel currentUserModel;
     ActivityResultLauncher<Intent> imagePickLauncher;
@@ -68,20 +66,12 @@ public class ProfileFragment extends Fragment {
         phoneInput = view.findViewById(R.id.profile_phone);
         updateProfileBtn = view.findViewById(R.id.profle_update_btn);
         progressBar = view.findViewById(R.id.profile_progress_bar);
-        logoutBtn = view.findViewById(R.id.logout_btn);
 
         getUserData();
 
         updateProfileBtn.setOnClickListener(v -> updateBtnClick());
-        logoutBtn.setOnClickListener(v -> FirebaseMessaging.getInstance().deleteToken()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        FirebaseUtil.logout();
-                        Intent intent = new Intent(getContext(), SplashActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                    }
-                }));
+
+
 
         profilePic.setOnClickListener(v -> ImagePicker.with(this).cropSquare().compress(512).maxResultSize(512, 512)
                 .createIntent(intent -> {

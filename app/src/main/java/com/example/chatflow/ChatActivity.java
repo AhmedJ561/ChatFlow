@@ -1,14 +1,17 @@
 package com.example.chatflow;
 
 import android.app.Dialog;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,8 +29,9 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.Query;
 
 import java.util.Arrays;
+import java.util.UUID;
 
-public class ChatActivity extends AppCompatActivity {
+public class ChatActivity extends AppCompatActivity implements ChatRecyclerAdapter.DeleteMessageListener {
 
     UserModel otherUser;
     String chatroomId;
@@ -40,6 +44,7 @@ public class ChatActivity extends AppCompatActivity {
     TextView otherUsername;
     RecyclerView recyclerView;
     ImageView imageView;
+    String lastMsg="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,17 +66,14 @@ public class ChatActivity extends AppCompatActivity {
         if (otherUser.getProfilePicBase64() != null) {
             AndroidUtil.setProfilePicFromBase64(this, otherUser.getProfilePicBase64(), imageView);
         }
-        imageView.setOnClickListener(v -> {
-            // Show the image in the dialog
-            showImagePopup();
-        });
-
+        imageView.setOnClickListener(v -> showImagePopup());
         backBtn.setOnClickListener(v -> onBackPressed());
         otherUsername.setText(otherUser.getUsername());
 
         sendMessageBtn.setOnClickListener(v -> {
             String message = messageInput.getText().toString().trim();
             if (message.isEmpty()) return;
+            lastMsg=messageInput.getText().toString();
             sendMessageToUser(message);
         });
 
@@ -87,16 +89,19 @@ public class ChatActivity extends AppCompatActivity {
                 .setQuery(query, ChatMessageModel.class).build();
 
         adapter = new ChatRecyclerAdapter(options, getApplicationContext());
+        adapter.setDeleteMessageListener(this); // Set the listener
         LinearLayoutManager manager = new LinearLayoutManager(this);
         manager.setReverseLayout(true);
         recyclerView.setLayoutManager(manager);
         recyclerView.setAdapter(adapter);
         adapter.startListening();
+
+        // Scroll to the bottom when the adapter is updated
         adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {
                 super.onItemRangeInserted(positionStart, itemCount);
-                recyclerView.smoothScrollToPosition(0);
+                recyclerView.scrollToPosition(0); // Scroll to the bottom
             }
         });
     }
@@ -107,13 +112,30 @@ public class ChatActivity extends AppCompatActivity {
         chatroomModel.setLastMessage(message);
         FirebaseUtil.getChatroomReference(chatroomId).set(chatroomModel);
 
-        ChatMessageModel chatMessageModel = new ChatMessageModel(message, FirebaseUtil.currentUserId(), Timestamp.now());
-        FirebaseUtil.getChatroomMessageReference(chatroomId).add(chatMessageModel)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        messageInput.setText("");
-                    }
-                });
+        FirebaseUtil.currentUserDetails().get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                String senderUsername = documentSnapshot.getString("username");
+                String senderProfilePicBase64 = documentSnapshot.getString("profilePicBase64");
+
+                String messageId = UUID.randomUUID().toString(); // Generate a unique message ID
+                ChatMessageModel chatMessageModel = new ChatMessageModel(
+                        messageId,
+                        message,
+                        FirebaseUtil.currentUserId(),
+                        senderUsername,
+                        senderProfilePicBase64,
+                        Timestamp.now(),
+                        false
+                );
+                FirebaseUtil.getChatroomMessageReference(chatroomId).document(messageId).set(chatMessageModel)
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                messageInput.setText("");
+                                recyclerView.scrollToPosition(0); // Scroll to the bottom
+                            }
+                        });
+            }
+        });
     }
 
     void getOrCreateChatroomModel() {
@@ -135,34 +157,25 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void showImagePopup() {
-        // Create a dialog to show the image
         final Dialog imageDialog = new Dialog(this);
         imageDialog.setContentView(R.layout.dialog_image_popup);
         ImageView popupImageView = imageDialog.findViewById(R.id.popup_image_view);
         Drawable imageDrawable = imageView.getDrawable();
 
         if (imageDrawable != null) {
-            // Convert Drawable to Bitmap (assuming it's BitmapDrawable)
             Bitmap bitmap = drawableToBitmap(imageDrawable);
-
-            // Scale the Bitmap (for example, make it larger)
             Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, 800, 800, true);
-
-            // Set the scaled bitmap to the dialog's ImageView
             popupImageView.setImageBitmap(scaledBitmap);
         }
 
-        // Show the dialog
         imageDialog.show();
     }
 
-    // Helper method to convert Drawable to Bitmap
     private Bitmap drawableToBitmap(Drawable drawable) {
         if (drawable instanceof BitmapDrawable) {
             return ((BitmapDrawable) drawable).getBitmap();
         }
 
-        // If not BitmapDrawable, create a new Bitmap from the drawable
         Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
@@ -170,4 +183,60 @@ public class ChatActivity extends AppCompatActivity {
         return bitmap;
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences preferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
+        int wallpaperResId = preferences.getInt("selected_wallpaper", -1);
+
+        RelativeLayout rootLayout = findViewById(R.id.activity_chat_root);
+        if (rootLayout != null) {
+            if (wallpaperResId == -1) {
+                rootLayout.setBackgroundColor(getResources().getColor(android.R.color.white));
+            } else {
+                rootLayout.setBackgroundResource(wallpaperResId);
+            }
+        }
+    }
+
+    @Override
+    public void onDeleteMessage(ChatMessageModel model) {
+        // Forbidden emoji for deleted message
+        String deletedMessageText = "This message was deleted! 🚫";
+
+        // Update the message document to set the deleted status and modify the message text
+        FirebaseUtil.getChatroomMessageReference(chatroomId).document(model.getMessageId())
+                .update("deleted", true, "message", deletedMessageText) // Update deleted flag and message content
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("DeleteMessage", "Message deleted successfully.");
+                    model.setDeleted(true); // Update the local model to reflect deletion
+                    model.setMessage(deletedMessageText); // Update message to deleted text
+
+                    // Now check if this was the last message
+                    FirebaseUtil.getChatroomReference(chatroomId).get()
+                            .addOnSuccessListener(documentSnapshot -> {
+                                if (documentSnapshot.exists()) {
+                                    String lastMessage = documentSnapshot.getString("lastMessage");
+                                    Log.d("lastmessage",lastMessage+"->"+lastMsg);
+                                    if (lastMessage != null && lastMessage.equals(lastMsg)) {
+                                        // This was the last message, so update the chatroom's last message
+                                        FirebaseUtil.getChatroomReference(chatroomId)
+                                                .update("lastMessage", deletedMessageText)
+                                                .addOnSuccessListener(aVoid1 -> {
+                                                    Log.d("DeleteMessage", "Last message updated to deleted text.");
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    Log.e("DeleteMessage", "Error updating last message: " + e.getMessage(), e);
+                                                });
+                                    }
+                                }
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e("DeleteMessage", "Error retrieving chatroom reference: " + e.getMessage(), e);
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("DeleteMessage", "Error deleting message: " + e.getMessage(), e);
+                });
+    }
 }

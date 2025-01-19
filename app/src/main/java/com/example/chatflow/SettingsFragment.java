@@ -1,5 +1,6 @@
 package com.example.chatflow;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -22,6 +23,12 @@ public class SettingsFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
+        Button buttonSetWallpaper = view.findViewById(R.id.button_set_wallpaper);
+
+        buttonSetWallpaper.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), WallpaperActivity.class);
+            startActivity(intent);
+        });
 
         spinnerFontSize = view.findViewById(R.id.spinner_font_size);
         buttonSave = view.findViewById(R.id.button_save);
