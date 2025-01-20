@@ -8,6 +8,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -186,18 +187,30 @@ public class ChatActivity extends AppCompatActivity implements ChatRecyclerAdapt
     @Override
     protected void onResume() {
         super.onResume();
+
         SharedPreferences preferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
         int wallpaperResId = preferences.getInt("selected_wallpaper", -1);
 
         RelativeLayout rootLayout = findViewById(R.id.activity_chat_root);
         if (rootLayout != null) {
             if (wallpaperResId == -1) {
-                rootLayout.setBackgroundColor(getResources().getColor(android.R.color.white));
+                // Use the default background color from the current theme
+                TypedValue typedValue = new TypedValue();
+                getTheme().resolveAttribute(android.R.attr.windowBackground, typedValue, true);
+
+                if (typedValue.type == TypedValue.TYPE_REFERENCE) {
+                    // If the resolved attribute is a reference (e.g., color or drawable resource)
+                    rootLayout.setBackgroundResource(typedValue.resourceId);
+                } else {
+                    // If the resolved attribute is a direct color value
+                    rootLayout.setBackgroundColor(typedValue.data);
+                }
             } else {
                 rootLayout.setBackgroundResource(wallpaperResId);
             }
         }
     }
+
 
     @Override
     public void onDeleteMessage(ChatMessageModel model) {

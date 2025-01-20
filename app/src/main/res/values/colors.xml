@@ -15,4 +15,6 @@
     <color name="my_primary_dark">#3700B3</color>
     <color name="my_secondary_dark">#03DAC5</color>
     <color name="dark_background">#121212</color>
+    <color name="edit_text_color">#FAFAFA</color>
+    <color name="text_color">#FF000000</color>
 </resources>

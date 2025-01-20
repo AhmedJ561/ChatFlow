@@ -43,6 +43,7 @@ public class WallpaperActivity extends AppCompatActivity {
 
         ViewPager2 viewPager = findViewById(R.id.viewpager_wallpapers);
         Button saveButton = findViewById(R.id.button_save_wallpaper);
+        Button removeButton = findViewById(R.id.button_remove_wallpaper);
 
         WallpaperPagerAdapter adapter = new WallpaperPagerAdapter(this, wallpaperResIds);
         viewPager.setAdapter(adapter);
@@ -69,5 +70,17 @@ public class WallpaperActivity extends AppCompatActivity {
                 Toast.makeText(this, "Please select a wallpaper.", Toast.LENGTH_SHORT).show();
             }
         });
+
+        // Remove the wallpaper
+        removeButton.setOnClickListener(v -> {
+            SharedPreferences preferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.remove("selected_wallpaper"); // Remove the saved wallpaper
+            editor.apply();
+
+            Toast.makeText(this, "Wallpaper removed!", Toast.LENGTH_SHORT).show();
+            finish();
+        });
     }
+
 }

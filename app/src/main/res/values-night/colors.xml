@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/values/colors.xml -->
+<resources>
+    <color name="my_primary">#FFAB40</color>
+    <color name="my_secondary">#FF7043</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="off_white">#E0E0E0</color>
+    <color name="light_gray">#BDBDBD</color>
+    <color name="chat_color_sender">#42A5F5</color>
+    <color name="chat_color_receiver">#9CCC65</color>
+    <color name="my_primary_dark">#512DA8</color>
+    <color name="my_secondary_dark">#80CBC4</color>
+    <color name="dark_background">#121212</color>
+    <color name="edit_text_color">#616161</color>
+    <color name="text_color">#E0E0E0</color>
+</resources>
+
+
+

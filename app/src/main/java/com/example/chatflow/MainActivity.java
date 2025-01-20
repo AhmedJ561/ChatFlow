@@ -5,16 +5,15 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -41,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         applySettings(); // Apply saved settings before super.onCreate
 
         super.onCreate(savedInstanceState);
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+
         setContentView(R.layout.activity_main);
 
         chatFragment = new ChatFragment();
@@ -109,7 +108,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Fetch user data from Firebase and update the drawer
         FirebaseUtil.currentUserDetails().get().addOnCompleteListener(task -> {
-
             if (task.isSuccessful()) {
                 // Retrieve the user model from the task result
                 UserModel userModel = task.getResult().toObject(UserModel.class);
@@ -126,22 +124,27 @@ public class MainActivity extends AppCompatActivity {
                         ImageView profilePicImageView = navigationView.getHeaderView(0).findViewById(R.id.nav_header_profile_pic);
                         if (profilePicImageView != null) {
                             try {
-                                AndroidUtil.setProfilePicFromBase64(MainActivity.this, userModel.getProfilePicBase64(), profilePicImageView);
+                                if (!isFinishing() && !isDestroyed()) {
+                                    AndroidUtil.setProfilePicFromBase64(MainActivity.this, userModel.getProfilePicBase64(), profilePicImageView);
+                                }
                             } catch (Exception e) {
                                 // Log error if setting profile picture fails
-                                Log.e("MainActivity", "Error setting profile picture", e);
                             }
                         }
                     }
-                } else {
-                    // Handle case where userModel is null
-                    Log.w("MainActivity", "User model is null");
                 }
             } else {
                 // Handle failure in fetching user data
-                Log.e("MainActivity", "Error fetching user data", task.getException());
                 // Optionally, show a toast or error message
                 Toast.makeText(MainActivity.this, "Failed to fetch user data", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Disable back button press in MainActivity
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                // Do nothing
             }
         });
     }
