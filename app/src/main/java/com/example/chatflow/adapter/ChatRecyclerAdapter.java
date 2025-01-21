@@ -57,7 +57,9 @@ public class ChatRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMessageMod
 
             // Attach long-click listener for right-hand chat
             holder.rightChatLayout.setOnLongClickListener(v -> {
-                showPopupMenu(v, model);
+                if (!model.isDeleted()) {
+                    showPopupMenu(v, model);
+                }
                 return true;
             });
         } else {
@@ -73,7 +75,6 @@ public class ChatRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMessageMod
             holder.leftChatLayout.setOnLongClickListener(null);
         }
     }
-
 
     @NonNull
     @Override
