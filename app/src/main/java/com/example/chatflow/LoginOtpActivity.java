@@ -135,7 +135,7 @@ public class LoginOtpActivity extends AppCompatActivity {
     void startResendTimer(){
         resendOtpTextView.setEnabled(false);
         Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
+        timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 timeoutSeconds--;

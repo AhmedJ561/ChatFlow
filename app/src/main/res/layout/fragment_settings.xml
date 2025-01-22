@@ -26,6 +26,12 @@
             android:background="@drawable/edit_text_rounded_corner"
             android:padding="12dp"
             android:layout_margin="10dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Chat Settings"
+            android:textSize="16sp"
+            android:paddingVertical="8dp" />
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/button_set_wallpaper"
             android:layout_width="match_parent"

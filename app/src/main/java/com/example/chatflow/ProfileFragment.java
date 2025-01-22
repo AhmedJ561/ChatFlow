@@ -14,7 +14,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -52,7 +51,9 @@ public class ProfileFragment extends Fragment {
                         Intent data = result.getData();
                         if (data != null && data.getData() != null) {
                             selectedImageUri = data.getData();
-                            AndroidUtil.setProfilePic(getContext(), selectedImageUri, profilePic);
+                            if (getContext() != null && isAdded()) {
+                                AndroidUtil.setProfilePic(getContext(), selectedImageUri, profilePic);
+                            }
                         }
                     }
                 });
@@ -70,8 +71,6 @@ public class ProfileFragment extends Fragment {
         getUserData();
 
         updateProfileBtn.setOnClickListener(v -> updateBtnClick());
-
-
 
         profilePic.setOnClickListener(v -> ImagePicker.with(this).cropSquare().compress(512).maxResultSize(512, 512)
                 .createIntent(intent -> {
@@ -121,19 +120,25 @@ public class ProfileFragment extends Fragment {
         setInProgress(true);
         FirebaseUtil.currentUserDetails().get().addOnCompleteListener(task -> {
             setInProgress(false);
-            currentUserModel = task.getResult().toObject(UserModel.class);
-            usernameInput.setText(currentUserModel.getUsername());
-            phoneInput.setText(currentUserModel.getPhone());
+            if (task.isSuccessful()) {
+                currentUserModel = task.getResult().toObject(UserModel.class);
+                if (currentUserModel != null) {
+                    usernameInput.setText(currentUserModel.getUsername());
+                    phoneInput.setText(currentUserModel.getPhone());
 
-            String base64String = currentUserModel.getProfilePicBase64();
-            if (base64String != null) {
-                AndroidUtil.setProfilePicFromBase64(getContext(), base64String, profilePic); // Circular crop for base64
-            } else if (selectedImageUri != null) {
-                AndroidUtil.setProfilePic(getContext(), selectedImageUri, profilePic); // Circular crop for URI
+                    String base64String = currentUserModel.getProfilePicBase64();
+                    if (base64String != null && getContext() != null && isAdded()) {
+                        AndroidUtil.setProfilePicFromBase64(getContext(), base64String, profilePic); // Circular crop for base64
+                    } else if (selectedImageUri != null && getContext() != null && isAdded()) {
+                        AndroidUtil.setProfilePic(getContext(), selectedImageUri, profilePic); // Circular crop for URI
+                    }
+                }
+            } else {
+                // Handle failure
+                AndroidUtil.showToast(getContext(), "Failed to fetch user data");
             }
         });
     }
-
 
     void setInProgress(boolean inProgress) {
         if (inProgress) {
