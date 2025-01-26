@@ -5,9 +5,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,46 +23,40 @@ import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity {
 
-    BottomNavigationView bottomNavigationView;
-    ImageButton searchButton;
-    RelativeLayout mainToolbar;
-
-    ChatFragment chatFragment;
-    ProfileFragment profileFragment;
-    SettingsFragment settingsFragment;
+    private BottomNavigationView bottomNavigationView;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
 
+    private final ChatFragment chatFragment = new ChatFragment();
+    private final ProfileFragment profileFragment = new ProfileFragment();
+    private final SettingsFragment settingsFragment = new SettingsFragment();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        applySettings(); // Apply saved settings before super.onCreate
-
+        applySettings();
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
 
-        chatFragment = new ChatFragment();
-        profileFragment = new ProfileFragment();
-        settingsFragment = new SettingsFragment();
-
+        initViews();
+        setupBottomNavigation();
+        setupDrawer();
+        fetchUserData();
+        handleBackPress();
+    }
+    private void initViews() {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
-        searchButton = findViewById(R.id.main_search_btn);
-        mainToolbar = findViewById(R.id.main_toolbar);
-        drawerLayout = findViewById(R.id.drawer_layout); // Initialize drawerLayout
-        navigationView = findViewById(R.id.navigation_view); // Initialize navigationView
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.navigation_view);
 
-        // Set up the toolbar and drawer toggle
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawerLayout, R.string.drawer_open, R.string.drawer_close);
-        drawerLayout.addDrawerListener(toggle);
-        toggle.syncState();
+        findViewById(R.id.main_search_btn).setOnClickListener(v ->
+                startActivity(new Intent(this, SearchUserActivity.class))
+        );
 
-        // Set up search button click listener
-        searchButton.setOnClickListener(v -> {
-            startActivity(new Intent(MainActivity.this, SearchUserActivity.class));
-        });
-
-        // Bottom navigation item selection handling
+        findViewById(R.id.toolbar_hamburger).setOnClickListener(v ->
+                drawerLayout.openDrawer(GravityCompat.START)
+        );
+    }
+    private void setupBottomNavigation() {
         bottomNavigationView.setOnItemSelectedListener(item -> {
             if (item.getItemId() == R.id.menu_chat) {
                 getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_layout, chatFragment).commit();
@@ -75,95 +67,65 @@ public class MainActivity extends AppCompatActivity {
             }
             return true;
         });
-
         bottomNavigationView.setSelectedItemId(R.id.menu_chat);
+    }
+    private void setupDrawer() {
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawerLayout, R.string.drawer_open, R.string.drawer_close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
 
-        // Set up drawer item click listener
         navigationView.setNavigationItemSelectedListener(item -> {
             if (item.getItemId() == R.id.nav_about) {
-                // Open AboutActivity
-                startActivity(new Intent(MainActivity.this, AboutActivity.class));
-                drawerLayout.closeDrawer(GravityCompat.START);
-                return true;
+                startActivity(new Intent(this, AboutActivity.class));
             } else if (item.getItemId() == R.id.nav_logout) {
-                // Handle Logout click
-                FirebaseUtil.logout();
-                Intent intent = new Intent(MainActivity.this, SplashActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-                Toast.makeText(MainActivity.this, "User Logged Out!", Toast.LENGTH_SHORT).show();
-                drawerLayout.closeDrawer(GravityCompat.START);
-                return true;
+                handleLogout();
             }
-            // Close drawer after selection
             drawerLayout.closeDrawer(GravityCompat.START);
             return true;
         });
+    }
+    private void fetchUserData() {
+        FirebaseUtil.currentUserDetails().get().addOnSuccessListener(snapshot -> {
+            UserModel userModel = snapshot.toObject(UserModel.class);
+            if (userModel != null) updateDrawerHeader(userModel);
+        }).addOnFailureListener(e ->
+                Toast.makeText(this, "Failed to fetch user data", Toast.LENGTH_SHORT).show()
+        );
+    }
+    private void updateDrawerHeader(UserModel userModel) {
+        TextView usernameTextView = navigationView.getHeaderView(0).findViewById(R.id.nav_header_username);
+        ImageView profilePicImageView = navigationView.getHeaderView(0).findViewById(R.id.nav_header_profile_pic);
 
-        // Handle the hamburger icon in the toolbar to open the drawer
-        ImageButton hamburgerIcon = findViewById(R.id.toolbar_hamburger);
-        hamburgerIcon.setOnClickListener(v -> {
-            drawerLayout.openDrawer(GravityCompat.START); // Open the drawer
-        });
+        if (usernameTextView != null) usernameTextView.setText(userModel.getUsername());
+        if (profilePicImageView != null && userModel.getProfilePicBase64() != null) {
+            AndroidUtil.setProfilePicFromBase64(this, userModel.getProfilePicBase64(), profilePicImageView);
+        }
+    }
+    private void handleLogout() {
+        FirebaseUtil.logout();
+        Intent intent = new Intent(this, SplashActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        Toast.makeText(this, "User Logged Out!", Toast.LENGTH_SHORT).show();
+    }
 
-        // Fetch user data from Firebase and update the drawer
-        FirebaseUtil.currentUserDetails().get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                // Retrieve the user model from the task result
-                UserModel userModel = task.getResult().toObject(UserModel.class);
-
-                if (userModel != null) {
-                    // Set the username in the drawer
-                    TextView usernameTextView = navigationView.getHeaderView(0).findViewById(R.id.nav_header_username);
-                    if (usernameTextView != null) {
-                        usernameTextView.setText(userModel.getUsername());
-                    }
-
-                    // Set the Base64 profile picture if it exists
-                    if (userModel.getProfilePicBase64() != null && !userModel.getProfilePicBase64().isEmpty()) {
-                        ImageView profilePicImageView = navigationView.getHeaderView(0).findViewById(R.id.nav_header_profile_pic);
-                        if (profilePicImageView != null) {
-                            try {
-                                if (!isFinishing() && !isDestroyed()) {
-                                    AndroidUtil.setProfilePicFromBase64(MainActivity.this, userModel.getProfilePicBase64(), profilePicImageView);
-                                }
-                            } catch (Exception e) {
-                                // Log error if setting profile picture fails
-                            }
-                        }
-                    }
-                }
-            } else {
-                // Handle failure in fetching user data
-                // Optionally, show a toast or error message
-                Toast.makeText(MainActivity.this, "Failed to fetch user data", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        // Disable back button press in MainActivity
+    private void handleBackPress() {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                // Do nothing
+                // Disable back press
             }
         });
     }
-
     private void applySettings() {
         SharedPreferences sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
-        float fontSize = sharedPreferences.getFloat("font_size", 1.0f); // Get saved font size
-        updateFontSize(fontSize); // Apply the saved font size
+        updateFontSize(sharedPreferences.getFloat("font_size", 1.0f));
     }
-
     private void updateFontSize(float scaleFactor) {
-        // Get the current configuration
-        Configuration configuration = getResources().getConfiguration();
-
-        // Update the font scale
-        configuration.fontScale = scaleFactor;
-
-        // Update the resources configuration
+        Configuration config = getResources().getConfiguration();
+        config.fontScale = scaleFactor;
         Resources resources = getResources();
-        resources.updateConfiguration(configuration, resources.getDisplayMetrics());
+        resources.updateConfiguration(config, resources.getDisplayMetrics());
     }
 }

@@ -157,8 +157,4 @@ public class ProfileFragment extends Fragment {
         return Base64.encodeToString(imageBytes, Base64.DEFAULT);
     }
 
-    Bitmap convertBase64ToBitmap(String base64String) {
-        byte[] decodedBytes = Base64.decode(base64String, Base64.DEFAULT);
-        return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
-    }
 }

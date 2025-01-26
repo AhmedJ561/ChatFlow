@@ -1,5 +1,7 @@
 package com.example.chatflow.utils;
 
+import android.annotation.SuppressLint;
+
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
@@ -55,6 +57,7 @@ public class FirebaseUtil {
         }
     }
 
+    @SuppressLint("SimpleDateFormat")
     public static String timestampToString(Timestamp timestamp) {
         return new SimpleDateFormat("HH:mm").format(timestamp.toDate());
     }

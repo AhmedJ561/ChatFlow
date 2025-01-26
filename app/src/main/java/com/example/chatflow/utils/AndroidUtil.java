@@ -38,9 +38,9 @@ public class AndroidUtil {
     public static void setProfilePic(Context context, Uri imageUri, ImageView imageView) {
         if (imageUri != null) {
             Glide.with(context)
-                    .load(imageUri) // Load the image from the URI
-                    .apply(RequestOptions.circleCropTransform()) // Apply circular crop
-                    .into(imageView); // Set the image to the ImageView
+                    .load(imageUri)
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(imageView);
         }
     }
 
@@ -49,18 +49,11 @@ public class AndroidUtil {
             byte[] decodedString = Base64.decode(base64String, Base64.DEFAULT);
             Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
             Glide.with(context)
-                    .load(decodedByte) // Convert the Bitmap to Glide
-                    .apply(RequestOptions.circleCropTransform()) // Apply circular crop
-                    .into(imageView); // Set the image to the ImageView
+                    .load(decodedByte)
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(imageView);
         }
     }
 
-    public static void setProfilePic(Context context, String base64String, Uri imageUri, ImageView imageView) {
-        if (base64String != null) {
-            setProfilePicFromBase64(context, base64String, imageView); // Use base64 image
-        } else if (imageUri != null) {
-            setProfilePic(context, imageUri, imageView); // Use URI image
-        }
-    }
 
 }

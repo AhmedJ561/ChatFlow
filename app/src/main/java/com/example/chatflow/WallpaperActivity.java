@@ -13,7 +13,7 @@ import com.example.chatflow.adapter.WallpaperPagerAdapter;
 
 public class WallpaperActivity extends AppCompatActivity {
 
-    private int[] wallpaperResIds = {
+    private final int[] wallpaperResIds = {
             R.drawable.wallpaper1,
             R.drawable.wallpaper2,
             R.drawable.wallpaper3,

@@ -7,7 +7,7 @@ public class UserModel {
     private String username;
     private Timestamp createdTimestamp;
     private String userId;
-    private String profilePicBase64;  // New field for Base64-encoded profile picture
+    private String profilePicBase64;
 
     public UserModel() {
     }
