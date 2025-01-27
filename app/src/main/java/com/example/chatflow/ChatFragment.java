@@ -1,5 +1,6 @@
 package com.example.chatflow;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -63,6 +64,7 @@ public class ChatFragment extends Fragment {
             adapter.stopListening();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onResume() {
         super.onResume();

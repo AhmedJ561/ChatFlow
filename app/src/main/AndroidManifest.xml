@@ -20,13 +20,6 @@
             android:name=".WallpaperActivity"
             android:exported="false" />
 
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@drawable/launcher_icon" />
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_color"
-            android:resource="@color/my_primary" />
-
         <activity
             android:name=".ChatActivity"
             android:exported="false">
