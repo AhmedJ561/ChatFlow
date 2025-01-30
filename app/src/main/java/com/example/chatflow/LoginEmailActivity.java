@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.chatflow.utils.AndroidUtil;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -76,8 +77,7 @@ public class LoginEmailActivity extends AppCompatActivity {
                         } else if (errorMessage.contains("no user record")) {
                             emailEditText.setError("No user found with this email");
                         } else {
-                            Toast.makeText(LoginEmailActivity.this, "Authentication failed: " + errorMessage,
-                                    Toast.LENGTH_SHORT).show();
+                            AndroidUtil.showToast(LoginEmailActivity.this,"Authentication failed: " + errorMessage);
                         }
                     }
                 });
