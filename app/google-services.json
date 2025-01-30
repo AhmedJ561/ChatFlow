@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "363543999926",
-    "project_id": "eaze-chat-db",
-    "storage_bucket": "eaze-chat-db.firebasestorage.app"
+    "project_number": "248967427598",
+    "project_id": "chatapp-d0541",
+    "storage_bucket": "chatapp-d0541.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:363543999926:android:ba7466f7511fcea02dbd17",
+        "mobilesdk_app_id": "1:248967427598:android:600a1781f87de3ffc9ee5f",
         "android_client_info": {
-          "package_name": "com.example.chatflow"
+          "package_name": "com.example.chat_app"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBM5Uzz_KIHMFoOBimley83VUBnjXLXMUU"
+          "current_key": "AIzaSyBjxvcccdYjshm_6M4lQFag7M93cLP3wH8"
         }
       ],
       "services": {
@@ -26,15 +26,15 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:363543999926:android:a72b8b4d4ebcdb542dbd17",
+        "mobilesdk_app_id": "1:248967427598:android:c3bb0a75bdae07c7c9ee5f",
         "android_client_info": {
-          "package_name": "com.example.eazechat"
+          "package_name": "com.example.chatflow"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBM5Uzz_KIHMFoOBimley83VUBnjXLXMUU"
+          "current_key": "AIzaSyBjxvcccdYjshm_6M4lQFag7M93cLP3wH8"
         }
       ],
       "services": {

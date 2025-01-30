@@ -6,12 +6,12 @@ import android.os.Handler;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.chatflow.model.UserModel;
-import com.example.chatflow.utils.AndroidUtil;
-import com.example.chatflow.utils.FirebaseUtil;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class SplashActivity extends AppCompatActivity {
+
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,43 +20,13 @@ public class SplashActivity extends AppCompatActivity {
 
         // Initialize Firebase
         FirebaseApp.initializeApp(this);
+        mAuth = FirebaseAuth.getInstance();
 
-        if (getIntent().getExtras() != null) {
-            String userId = getIntent().getExtras().getString("userId");
-
-            if (userId != null) {
-                FirebaseUtil.allUserCollectionReference().document(userId).get()
-                        .addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                UserModel model = task.getResult().toObject(UserModel.class);
-
-                                Intent mainIntent = new Intent(this, MainActivity.class);
-                                mainIntent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                                startActivity(mainIntent);
-
-                                Intent intent = new Intent(this, ChatActivity.class);
-                                AndroidUtil.passUserModelAsIntent(intent, model);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(intent);
-                                finish();
-                            } else {
-                                proceedToNextActivity();
-                            }
-                        });
-            } else {
-                proceedToNextActivity();
-            }
-        } else {
-            proceedToNextActivity();
-        }
-    }
-
-    private void proceedToNextActivity() {
         new Handler().postDelayed(() -> {
-            if (FirebaseUtil.isLoggedIn()) {
+            if (mAuth.getCurrentUser() != null) {
                 startActivity(new Intent(SplashActivity.this, MainActivity.class));
             } else {
-                startActivity(new Intent(SplashActivity.this, LoginPhoneNumberActivity.class));
+                startActivity(new Intent(SplashActivity.this, LoginEmailActivity.class));
             }
             finish();
         }, 1000);

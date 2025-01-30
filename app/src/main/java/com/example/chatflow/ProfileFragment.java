@@ -32,7 +32,7 @@ public class ProfileFragment extends Fragment {
 
     ImageView profilePic;
     EditText usernameInput;
-    EditText phoneInput;
+    EditText emailInput;
     Button updateProfileBtn;
     ProgressBar progressBar;
 
@@ -64,7 +64,7 @@ public class ProfileFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         profilePic = view.findViewById(R.id.profile_image_view);
         usernameInput = view.findViewById(R.id.profile_username);
-        phoneInput = view.findViewById(R.id.profile_phone);
+        emailInput = view.findViewById(R.id.profile_email);
         updateProfileBtn = view.findViewById(R.id.profle_update_btn);
         progressBar = view.findViewById(R.id.profile_progress_bar);
 
@@ -124,7 +124,7 @@ public class ProfileFragment extends Fragment {
                 currentUserModel = task.getResult().toObject(UserModel.class);
                 if (currentUserModel != null) {
                     usernameInput.setText(currentUserModel.getUsername());
-                    phoneInput.setText(currentUserModel.getPhone());
+                    emailInput.setText(currentUserModel.getEmail());
 
                     String base64String = currentUserModel.getProfilePicBase64();
                     if (base64String != null && getContext() != null && isAdded()) {
@@ -156,5 +156,4 @@ public class ProfileFragment extends Fragment {
         byte[] imageBytes = outputStream.toByteArray();
         return Base64.encodeToString(imageBytes, Base64.DEFAULT);
     }
-
 }

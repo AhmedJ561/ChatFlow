@@ -20,12 +20,14 @@ import com.example.chatflow.utils.AndroidUtil;
 import com.example.chatflow.utils.FirebaseUtil;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNavigationView;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
+    private FirebaseAuth mAuth;
 
     private final ChatFragment chatFragment = new ChatFragment();
     private final ProfileFragment profileFragment = new ProfileFragment();
@@ -37,12 +39,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mAuth = FirebaseAuth.getInstance();
+
         initViews();
         setupBottomNavigation();
         setupDrawer();
         fetchUserData();
         handleBackPress();
     }
+
     private void initViews() {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -56,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
                 drawerLayout.openDrawer(GravityCompat.START)
         );
     }
+
     private void setupBottomNavigation() {
         bottomNavigationView.setOnItemSelectedListener(item -> {
             if (item.getItemId() == R.id.menu_chat) {
@@ -69,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
         });
         bottomNavigationView.setSelectedItemId(R.id.menu_chat);
     }
+
     private void setupDrawer() {
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawerLayout, R.string.drawer_open, R.string.drawer_close);
@@ -85,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
     }
+
     private void fetchUserData() {
         FirebaseUtil.currentUserDetails().get().addOnSuccessListener(snapshot -> {
             UserModel userModel = snapshot.toObject(UserModel.class);
@@ -93,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Failed to fetch user data", Toast.LENGTH_SHORT).show()
         );
     }
+
     private void updateDrawerHeader(UserModel userModel) {
         TextView usernameTextView = navigationView.getHeaderView(0).findViewById(R.id.nav_header_username);
         ImageView profilePicImageView = navigationView.getHeaderView(0).findViewById(R.id.nav_header_profile_pic);
@@ -102,8 +111,9 @@ public class MainActivity extends AppCompatActivity {
             AndroidUtil.setProfilePicFromBase64(this, userModel.getProfilePicBase64(), profilePicImageView);
         }
     }
+
     private void handleLogout() {
-        FirebaseUtil.logout();
+        mAuth.signOut();
         Intent intent = new Intent(this, SplashActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
@@ -118,10 +128,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
     private void applySettings() {
         SharedPreferences sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
         updateFontSize(sharedPreferences.getFloat("font_size", 1.0f));
     }
+
     private void updateFontSize(float scaleFactor) {
         Configuration config = getResources().getConfiguration();
         config.fontScale = scaleFactor;

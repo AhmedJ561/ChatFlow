@@ -22,16 +22,18 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 public class SearchUserRecyclerAdapter extends FirestoreRecyclerAdapter<UserModel, SearchUserRecyclerAdapter.UserModelViewHolder> {
 
     Context context;
+    TextView noUsersFoundText;
 
-    public SearchUserRecyclerAdapter(@NonNull FirestoreRecyclerOptions<UserModel> options, Context context) {
+    public SearchUserRecyclerAdapter(@NonNull FirestoreRecyclerOptions<UserModel> options, Context context, TextView noUsersFoundText) {
         super(options);
         this.context = context;
+        this.noUsersFoundText = noUsersFoundText;
     }
 
     @Override
     protected void onBindViewHolder(@NonNull UserModelViewHolder holder, int position, @NonNull UserModel model) {
         holder.usernameText.setText(model.getUsername());
-        holder.phoneText.setText(model.getPhone());
+        holder.emailText.setText(model.getEmail()); // Add email field
         if (model.getUserId().equals(FirebaseUtil.currentUserId())) {
             holder.usernameText.setText(model.getUsername() + " (Me)");
         }
@@ -59,14 +61,24 @@ public class SearchUserRecyclerAdapter extends FirestoreRecyclerAdapter<UserMode
 
     class UserModelViewHolder extends RecyclerView.ViewHolder {
         TextView usernameText;
-        TextView phoneText;
+        TextView emailText; // Add email field
         ImageView profilePic;
 
         public UserModelViewHolder(@NonNull View itemView) {
             super(itemView);
             usernameText = itemView.findViewById(R.id.user_name_text);
-            phoneText = itemView.findViewById(R.id.phone_text);
+            emailText = itemView.findViewById(R.id.email_text); // Add email field
             profilePic = itemView.findViewById(R.id.profile_pic_image_view);
+        }
+    }
+
+    @Override
+    public void onDataChanged() {
+        super.onDataChanged();
+        if (getItemCount() == 0) {
+            noUsersFoundText.setVisibility(View.VISIBLE);
+        } else {
+            noUsersFoundText.setVisibility(View.GONE);
         }
     }
 }

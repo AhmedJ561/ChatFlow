@@ -21,7 +21,7 @@ public class AndroidUtil {
 
     public static void passUserModelAsIntent(Intent intent, UserModel model) {
         intent.putExtra("username", model.getUsername());
-        intent.putExtra("phone", model.getPhone());
+        intent.putExtra("email", model.getEmail());
         intent.putExtra("userId", model.getUserId());
         intent.putExtra("profilePicBase64", model.getProfilePicBase64());
     }
@@ -29,7 +29,7 @@ public class AndroidUtil {
     public static UserModel getUserModelFromIntent(Intent intent) {
         UserModel userModel = new UserModel();
         userModel.setUsername(intent.getStringExtra("username"));
-        userModel.setPhone(intent.getStringExtra("phone"));
+        userModel.setEmail(intent.getStringExtra("email"));
         userModel.setUserId(intent.getStringExtra("userId"));
         userModel.setProfilePicBase64(intent.getStringExtra("profilePicBase64"));
         return userModel;
@@ -54,6 +54,4 @@ public class AndroidUtil {
                     .into(imageView);
         }
     }
-
-
 }

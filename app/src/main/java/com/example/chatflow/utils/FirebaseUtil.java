@@ -14,11 +14,11 @@ import java.util.List;
 public class FirebaseUtil {
 
     public static String currentUserId() {
-        return FirebaseAuth.getInstance().getUid();
+        return FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
 
     public static boolean isLoggedIn() {
-        return currentUserId() != null;
+        return FirebaseAuth.getInstance().getCurrentUser() != null;
     }
 
     public static DocumentReference currentUserDetails() {
@@ -65,5 +65,4 @@ public class FirebaseUtil {
     public static void logout() {
         FirebaseAuth.getInstance().signOut();
     }
-
 }

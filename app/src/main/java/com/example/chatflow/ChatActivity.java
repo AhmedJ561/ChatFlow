@@ -198,6 +198,7 @@ public class ChatActivity extends AppCompatActivity implements ChatRecyclerAdapt
             }
         });
     }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -205,6 +206,7 @@ public class ChatActivity extends AppCompatActivity implements ChatRecyclerAdapt
             adapter.startListening();
         }
     }
+
     @Override
     protected void onStop() {
         super.onStop();

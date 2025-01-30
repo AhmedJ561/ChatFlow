@@ -3,6 +3,7 @@ package com.example.chatflow;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -20,6 +21,7 @@ public class SearchUserActivity extends AppCompatActivity {
     ImageButton searchButton;
     ImageButton backButton;
     RecyclerView recyclerView;
+    TextView noUsersFoundText;
 
     SearchUserRecyclerAdapter adapter;
 
@@ -32,9 +34,9 @@ public class SearchUserActivity extends AppCompatActivity {
         searchButton = findViewById(R.id.search_user_btn);
         backButton = findViewById(R.id.back_btn);
         recyclerView = findViewById(R.id.search_user_recycler_view);
+        noUsersFoundText = findViewById(R.id.no_users_found_text);
 
         searchInput.requestFocus();
-
 
         backButton.setOnClickListener(v -> {
             onBackPressed();
@@ -53,17 +55,16 @@ public class SearchUserActivity extends AppCompatActivity {
     void setupSearchRecyclerView(String searchTerm){
 
         Query query = FirebaseUtil.allUserCollectionReference()
-                .whereGreaterThanOrEqualTo("username",searchTerm)
-                .whereLessThanOrEqualTo("username",searchTerm+'\uf8ff');
+                .whereGreaterThanOrEqualTo("username", searchTerm)
+                .whereLessThanOrEqualTo("username", searchTerm + '\uf8ff');
 
         FirestoreRecyclerOptions<UserModel> options = new FirestoreRecyclerOptions.Builder<UserModel>()
-                .setQuery(query,UserModel.class).build();
+                .setQuery(query, UserModel.class).build();
 
-        adapter = new SearchUserRecyclerAdapter(options,getApplicationContext());
+        adapter = new SearchUserRecyclerAdapter(options, getApplicationContext(), noUsersFoundText);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
         adapter.startListening();
-
     }
 
     @Override
@@ -87,15 +88,3 @@ public class SearchUserActivity extends AppCompatActivity {
             adapter.startListening();
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-

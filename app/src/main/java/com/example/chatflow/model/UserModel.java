@@ -3,7 +3,7 @@ package com.example.chatflow.model;
 import com.google.firebase.Timestamp;
 
 public class UserModel {
-    private String phone;
+    private String email;
     private String username;
     private Timestamp createdTimestamp;
     private String userId;
@@ -12,20 +12,20 @@ public class UserModel {
     public UserModel() {
     }
 
-    public UserModel(String phone, String username, Timestamp createdTimestamp, String userId, String profilePicBase64) {
-        this.phone = phone;
+    public UserModel(String email, String username, Timestamp createdTimestamp, String userId, String profilePicBase64) {
+        this.email = email;
         this.username = username;
         this.createdTimestamp = createdTimestamp;
         this.userId = userId;
         this.profilePicBase64 = profilePicBase64;
     }
 
-    public String getPhone() {
-        return phone;
+    public String getEmail() {
+        return email;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getUsername() {
