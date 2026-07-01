@@ -20,6 +20,12 @@ ChatFlow is a Java-based chat application built with a focus on performance and 
 - **Build Tool**: Gradle (Kotlin DSL)
 - **Project Type**: Android Application
 
+## 📹 Demo
+
+Check out a quick demo of ChatFlow in action:
+
+https://www.youtube.com/shorts/0nbugsEB-4E?si=b7573FBIj0zbb0xb
+
 ## 🚀 Getting Started
 
 ### Prerequisites
