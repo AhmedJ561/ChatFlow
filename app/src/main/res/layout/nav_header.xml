@@ -1,0 +1,32 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="150dp"
+    android:background="@color/my_primary"
+    android:orientation="vertical"
+    android:gravity="center">
+
+    <ImageView
+        android:id="@+id/nav_header_profile_pic"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/person_icon"
+        android:layout_marginBottom="8dp" />
+<LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Welcome, "
+        android:textColor="@color/white"
+        android:textStyle="bold"/>
+    <TextView
+        android:id="@+id/nav_header_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="User"
+        android:textColor="@android:color/white"
+        android:textStyle="bold" />
+</LinearLayout>
+</LinearLayout>
